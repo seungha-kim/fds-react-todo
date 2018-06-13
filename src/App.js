@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import TodoList from './components/TodoList';
 import axios from 'axios';
 
-let count = 1;
+import TodoList from './components/TodoList';
+import TodoForm from './components/TodoForm';
 
 const todoAPI = axios.create({
   baseURL: process.env.REACT_APP_API_URL
@@ -22,8 +22,7 @@ class App extends Component {
       //   body: 'Redux 공부',
       //   complete: false
       // },
-    ],
-    newTodoBody: ''
+    ]
   }
 
   async componentDidMount() {
@@ -41,16 +40,10 @@ class App extends Component {
     });
   }
 
-  handleInputChange = e => {
-    this.setState({
-      newTodoBody: e.target.value
-    });
-  }
-
-  handleButtonClick = async e => {
-    if (this.state.newTodoBody) {
+  createTodo = async newTodoBody => {
+    if (newTodoBody) {
       const newTodo = {
-        body: this.state.newTodoBody,
+        body: newTodoBody,
         complete: false
       };
 
@@ -59,9 +52,6 @@ class App extends Component {
       });
       await todoAPI.post('/todos', newTodo);
       await this.fetchTodos();
-      this.setState({
-        newTodoBody: ''
-      });
     }
   }
 
@@ -94,15 +84,11 @@ class App extends Component {
   }
 
   render() {
-    const {todos, newTodoBody, loading} = this.state;
+    const {todos, loading} = this.state;
     return (
       <div>
         <h1>할 일 목록</h1>
-        <label>
-          새 할일
-          <input type="text" value={newTodoBody} onChange={this.handleInputChange} />
-          <button onClick={this.handleButtonClick}>추가</button>
-        </label>
+        <TodoForm onCreate={this.createTodo} />
         {loading ? (
           <div>loading...</div>
         ) : (
